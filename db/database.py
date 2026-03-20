@@ -17,7 +17,8 @@ engine = create_engine(
 )
 
 def init_db():
-    from models import User, Credential 
+    from models.user import User
+    from models.credential import Credential
     
     SQLModel.metadata.create_all(engine)
     
