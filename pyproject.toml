@@ -19,7 +19,9 @@ dependencies = [
 [project.scripts]
 kryptos = "main:main"
 
+[tool.setuptools]
+py-modules = ["main"]
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["core*", "db*", "services*", "models*", "ui*"]
-py-modules = ["main"]
