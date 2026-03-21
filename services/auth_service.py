@@ -1,8 +1,8 @@
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from db.repositories import UserRepository
+from db.repository import UserRepository
 from core.crypto import VaultCrypto
-from models import User
+from models.user import User
 
 class AuthService:
     def __init__(self, user_repo: UserRepository):
@@ -17,7 +17,12 @@ class AuthService:
         auth_hash = self.ph.hash(master_password)
         encryption_salt = VaultCrypto.generate_salt()
 
-        return self.user_repo.create_user(username, auth_hash, encryption_salt)
+        new_user = User(
+            username=username,
+            auth_hash=auth_hash,
+            encryption_salt=encryption_salt
+        )
+        return self.user_repo.create_user(new_user)
 
     def login(self, username: str, master_password: str) -> VaultCrypto:
         user = self.user_repo.get_user_by_username(username)

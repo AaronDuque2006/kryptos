@@ -3,6 +3,7 @@ from models.user import User
 from models.credential import Credential
 from typing import List
 
+
 class UserRepository:
     def __init__(self, session: Session):
         self.session = session
@@ -21,16 +22,27 @@ class UserRepository:
         stament = select(User).where(User.username == username)
         return self.session.exec(stament).first()
 
+
 class CredentialRepository:
     def __init__(self, session: Session):
         self.session = session
 
-    def create_credential(self, user_id: int, title: str, nonce: bytes, encrypted_payload: bytes) -> Credential:
+    def create_credential(
+        self,
+        user_id: int,
+        title: str,
+        nonce: bytes,
+        encrypted_payload: bytes,
+        title_nonce: bytes | None = None,
+        encrypted_title: bytes | None = None,
+    ) -> Credential:
         new_credential = Credential(
             user_id=user_id,
             title=title,
             nonce=nonce,
-            encrypted_payload=encrypted_payload
+            encrypted_payload=encrypted_payload,
+            title_nonce=title_nonce,
+            encrypted_title=encrypted_title,
         )
         self.session.add(new_credential)
         self.session.commit()
@@ -41,13 +53,43 @@ class CredentialRepository:
         statement = select(Credential).where(Credential.user_id == user_id)
         return list(self.session.exec(statement).all())
 
-    def delete_credential(self, credential_id: int, user_id: int) -> bool:
+    def update_title_encryption(
+        self,
+        credential_id: int,
+        user_id: int,
+        placeholder_title: str,
+        title_nonce: bytes,
+        encrypted_title: bytes,
+    ) -> bool:
         statement = select(Credential).where(
             Credential.id == credential_id,
-            Credential.user_id == user_id
+            Credential.user_id == user_id,
         )
         credential = self.session.exec(statement).first()
-            
+
+        if not credential:
+            return False
+
+        credential.title = placeholder_title
+        credential.title_nonce = title_nonce
+        credential.encrypted_title = encrypted_title
+        self.session.add(credential)
+        self.session.commit()
+        return True
+
+    def update_credential(self, credential: Credential) -> Credential:
+        """Actualiza una credencial existente."""
+        self.session.add(credential)
+        self.session.commit()
+        self.session.refresh(credential)
+        return credential
+
+    def delete_credential(self, credential_id: int, user_id: int) -> bool:
+        statement = select(Credential).where(
+            Credential.id == credential_id, Credential.user_id == user_id
+        )
+        credential = self.session.exec(statement).first()
+
         if credential:
             self.session.delete(credential)
             self.session.commit()
