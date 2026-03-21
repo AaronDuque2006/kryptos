@@ -5,9 +5,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from models.credential import Credential
 
+
 def get_utc_now() -> datetime:
-    """Función auxiliar para asegurar que los timestamps tengan zona horaria UTC."""
+    # Función auxiliar para asegurar que los timestamps tengan zona horaria UTC.
     return datetime.now(timezone.utc)
+
 
 class User(SQLModel, table=True):
     __tablename__ = "users"
@@ -22,4 +24,6 @@ class User(SQLModel, table=True):
 
     created_at: datetime = Field(default_factory=get_utc_now)
 
-    credentials: list["Credential"] = Relationship(back_populates="user", cascade_delete=True)
+    credentials: list["Credential"] = Relationship(
+        back_populates="user", cascade_delete=True
+    )

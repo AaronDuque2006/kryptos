@@ -1,50 +1,53 @@
 import secrets
 import string
 
+
 class PasswordGenerator:
     """
     Generador de contraseñas criptográficamente seguro.
     Utiliza el módulo 'secrets' nativo de Python para acceder a la entropía del SO.
     """
-    
+
     # Caracteres disponibles
     UPPERCASE = string.ascii_uppercase
     LOWERCASE = string.ascii_lowercase
     DIGITS = string.digits
-    SYMBOLS = "!@#$%^&*()-_=+[]{}|;:,.<>?" 
+    SYMBOLS = "!@#$%^&*()-_=+[]{}|;:,.<>?"
 
     @classmethod
     def generate(
-        cls, 
-        length: int = 16, 
-        use_upper: bool = True, 
-        use_lower: bool = True, 
-        use_digits: bool = True, 
-        use_symbols: bool = True
+        cls,
+        length: int = 16,
+        use_upper: bool = True,
+        use_lower: bool = True,
+        use_digits: bool = True,
+        use_symbols: bool = True,
     ) -> str:
         """
-        Genera una contraseña segura garantizando al menos un carácter 
+        Genera una contraseña segura garantizando al menos un carácter
         de cada conjunto seleccionado.
         """
         if length < 8:
-            raise ValueError("Por seguridad, la longitud mínima debe ser de 8 caracteres.")
+            raise ValueError(
+                "Por seguridad, la longitud mínima debe ser de 8 caracteres."
+            )
 
         pool = ""
         guaranteed_chars = []
 
-        # 1. Construimos el pool general y aseguramos al menos un carácter por regla
+        # Se asegura al menos un carácter por regla
         if use_upper:
             pool += cls.UPPERCASE
             guaranteed_chars.append(secrets.choice(cls.UPPERCASE))
-        
+
         if use_lower:
             pool += cls.LOWERCASE
             guaranteed_chars.append(secrets.choice(cls.LOWERCASE))
-        
+
         if use_digits:
             pool += cls.DIGITS
             guaranteed_chars.append(secrets.choice(cls.DIGITS))
-        
+
         if use_symbols:
             pool += cls.SYMBOLS
             guaranteed_chars.append(secrets.choice(cls.SYMBOLS))
@@ -52,15 +55,14 @@ class PasswordGenerator:
         if not pool:
             raise ValueError("Debe seleccionar al menos un tipo de carácter.")
 
-        # 2. Rellenamos el resto de la longitud requerida de forma aleatoria desde el pool
+        # Se rellena la longitud requerida de forma aleatoria desde el pool
         remaining_length = length - len(guaranteed_chars)
         random_chars = [secrets.choice(pool) for _ in range(remaining_length)]
 
-        # 3. Unimos los caracteres garantizados con los aleatorios
+        # Se unen los caracteres garantizados con los aleatorios
         password_list = guaranteed_chars + random_chars
 
-        # 4. Mezclamos la lista de forma segura. 
-        # Usamos SystemRandom para evitar el random.shuffle() estándar.
+        # Se mezcla la lista de forma segura
         secure_random = secrets.SystemRandom()
         secure_random.shuffle(password_list)
 

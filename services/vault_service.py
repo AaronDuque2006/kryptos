@@ -28,9 +28,7 @@ class VaultService:
         url: str = "",
         notes: str = "",
     ):
-        """
-        Empaqueta los datos en un JSON, los encripta y los guarda en la base de datos.
-        """
+        # Se empaqueta los datos en un JSON, los encripta y los guarda en la base de datos.
         payload = {
             "username": username_used,
             "password": password_used,
@@ -38,13 +36,13 @@ class VaultService:
             "notes": notes,
         }
 
-        # El motor criptográfico nos devuelve el Nonce y el Payload Encriptado
+        # Devuelve el Nonce y el Payload Encriptado
         nonce, encrypted_payload = self.crypto_engine.encrypt_credential(payload)
         title_nonce, encrypted_title = self.crypto_engine.encrypt_credential(
             {"title": title}
         )
 
-        # Guardamos en la base de datos usando el repositorio
+        # Se guarda en la base de datos
         self.cred_repo.create_credential(
             user_id=self.current_user_id,
             title=self.TITLE_PLACEHOLDER,
@@ -56,15 +54,15 @@ class VaultService:
 
     def get_all_entries_decrypted(self) -> List[Dict]:
         """
-        Obtiene todas las credenciales del usuario, las desencripta en memoria
-        y las devuelve como una lista de diccionarios listos para mostrar en la TUI.
+        Se obtiene las credenciales del usuario, las desencripta en memoria
+        y las devuelve como una lista de diccionarios para mostrar en la TUI.
         """
         credentials = self.cred_repo.get_credentials_by_user(self.current_user_id)
         decrypted_list = []
 
         for cred in credentials:
             try:
-                # Desencriptamos el payload de cada entrada
+                # Se desemcripta el payload de cada entrada
                 decrypted_payload = self.crypto_engine.decrypt_credential(
                     cred.nonce, cred.encrypted_payload
                 )
@@ -120,9 +118,7 @@ class VaultService:
         url: str = "",
         notes: str = "",
     ) -> bool:
-        """
-        Actualiza una entrada existente: re-encripta todo el payload y el título.
-        """
+        # Se actualiza una entrada existente: re-encripta todo el payload y el título.
         credentials = self.cred_repo.get_credentials_by_user(self.current_user_id)
         credential = next((c for c in credentials if c.id == credential_id), None)
 
@@ -151,7 +147,5 @@ class VaultService:
         return True
 
     def delete_entry(self, credential_id: int) -> bool:
-        """
-        Elimina una entrada de la bóveda.
-        """
+        # Se elimina una entrada de la bóveda.
         return self.cred_repo.delete_credential(credential_id, self.current_user_id)

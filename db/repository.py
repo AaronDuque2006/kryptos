@@ -78,7 +78,7 @@ class CredentialRepository:
         return True
 
     def update_credential(self, credential: Credential) -> Credential:
-        """Actualiza una credencial existente."""
+        # Actualiza una credencial existente
         self.session.add(credential)
         self.session.commit()
         self.session.refresh(credential)

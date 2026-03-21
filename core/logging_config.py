@@ -2,7 +2,7 @@ import logging
 import os
 
 
-LOGGER_NAME = "password_manager"
+LOGGER_NAME = "kryptos"
 
 
 def configure_logging() -> logging.Logger:
