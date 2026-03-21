@@ -4,6 +4,8 @@ from ui.screens.dashboard_screen import DashboardScreen
 
 
 class PasswordManagerTUI(App):
+    TITLE = "Kryptos Password Manager"
+
     CSS = """
     Screen {
         background: #1e1e2e;
@@ -25,7 +27,7 @@ class PasswordManagerTUI(App):
     }
 
     #auth-container {
-        width: 64;
+        width: 72;
         height: auto;
         padding: 2 3;
         border: round #89b4fa;

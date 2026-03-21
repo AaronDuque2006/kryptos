@@ -44,7 +44,7 @@ class AuthScreen(Screen):
                 placeholder="Contraseña Maestra", id="input-password", password=True
             )
             yield Label(
-                "F2/Ctrl+N cambia Login↔Registro | Enter en password envía | Arriba/Abajo/Tab navega",
+                "F2/Ctrl+N: Login↔Registro | Enter: Enviar | Tab: Navegar",
                 id="auth-help",
             )
 
@@ -61,10 +61,10 @@ class AuthScreen(Screen):
         title = self.query_one("#auth-title", Label)
 
         if login_mode:
-            title.update("Iniciar Sesión en la Bóveda")
+            title.update("Iniciar Sesión")
             self.notify("Modo: Login", severity="information", timeout=1.5)
         else:
-            title.update("Registrar Nueva Bóveda")
+            title.update("Registrarse")
             self.notify("Modo: Registro", severity="information", timeout=1.5)
 
     def _current_field_index(self) -> int:
