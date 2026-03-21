@@ -16,10 +16,31 @@ Las caracteristicas de seguridad incluyen:
 
 ## Requisitos Previos
 
-Para poder instalar y ejecutar este proyecto correctamente debes tener instalados en tu sistema local:
-1. Python 3.12 o superior.
-2. El gestor de paquetes y entornos virtuales `uv` (recomendado) o `pip`.
-3. Git (para clonar el repositorio).
+Para poder instalar y ejecutar este proyecto correctamente en tu sistema operativo, es necesario contar con `uv`. Se trata de un gestor de paquetes y proyectos hiper-rapido para Python que automatiza la creacion de comandos terminales.
+
+### Como verificar si ya tienes `uv` instalado
+
+Abre tu terminal y ejecuta el siguiente comando:
+```bash
+uv --version
+```
+Si la terminal te responde con un numero de version (por ejemplo, `uv 0.1.x`), estas listo para proceder a la Instalacion Global.
+
+### Como instalar `uv` si no lo tienes
+
+Si el comando anterior arrojo un error, elige el metodo correspondiente a tu sistema operativo para instalar `uv` de manera oficial:
+
+- **Windows (En PowerShell):**
+  ```powershell
+  powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+  ```
+
+- **macOS y Linux:**
+  ```bash
+  curl -LsSf https://astral.sh/uv/install.sh | sh
+  ```
+
+*(Alternativa: Si ya cuentas con un entorno de Python antiguo configurado, tambien es posible instalar uv ejecutando simplemente `pip install uv`).*
 
 ---
 
