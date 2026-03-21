@@ -17,8 +17,8 @@ engine = create_engine(
 
 
 def init_db():
-    from models.user import User
-    from models.credential import Credential
+    from models.user import User  # noqa: F401
+    from models.credential import Credential  # noqa: F401
 
     SQLModel.metadata.create_all(engine)
     _run_schema_migrations()

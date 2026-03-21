@@ -25,25 +25,25 @@ Para poder instalar y ejecutar este proyecto correctamente debes tener instalado
 
 ## Proceso de Instalacion Global
 
-Para utilizar la aplicacion de manera nativa en tu sistema operativo, asegurate de seguir estos pasos.
+Para utilizar la aplicacion de manera nativa en tu sistema operativo, no necesitas clonar tu mismo el codigo. El gestor descargara y compilara todo por ti en un solo paso.
 
-1. Clona el repositorio en tu computadora:
-   ```bash
-   git clone https://github.com/AaronDuque2006/kryptos.git
-   ```
+Ejecuta el siguiente comando en tu terminal:
 
-2. Ingresa a la carpeta del proyecto recién clonada:
-   ```bash
-   cd kryptos
-   ```
+```bash
+uv tool install git+https://github.com/AaronDuque2006/kryptos.git
+```
 
-3. Utiliza la herramienta `uv tool` para realizar la instalacion global a partir del codigo fuente local:
-   ```bash
-   uv tool install .
-   ```
-   Nota: Si prefieres no usar `uv`, puedes instalarlo con pip estandar: `pip install .`
+Una vez finalizado el proceso, el sistema habra creado un comando global para todo el SO conectado al nucleo de la aplicacion.
 
-Una vez culminado el tercer paso de instalacion, el gestor de paquetes de Python habra creado un comando global para todo el SO conectado al archivo principal de la aplicacion.
+---
+
+## Actualizaciones
+
+Cuando exista una nueva version del software o un parche de seguridad, puedes actualizar toda la herramienta escribiendo un solo comando en la terminal:
+
+```bash
+uv tool upgrade kryptos-password-manager
+```
 
 ---
 
@@ -67,8 +67,9 @@ kryptos
 
 ## Entorno de Desarrollo y Tests
 
-Si deseas alterar el codigo fuente de la aplicacion para agregar mas funcionalidades, la manera sugerida de ejecutarla es:
+Si deseas modificar el codigo fuente de la aplicacion localmente, la manera sugerida de ejecutarla es:
 
-- Para sincronizar las dependencias: `uv sync`
-- Para correr la aplicacion sin instalar globalmente: `uv run pass-manager` o `uv run main.py`
-- Para ejecutar la suite de pruebas enfocada en temas de seguridad y arquitectura: `uv run python -m unittest discover -s tests`
+1. Clonar el repositorio: `git clone https://github.com/AaronDuque2006/kryptos.git`
+2. Para sincronizar las dependencias e instalar el entorno virtal: `uv sync`
+3. Para correr la aplicacion sin instalar globalmente: `uv run kryptos` o `uv run main.py`
+4. Para ejecutar la suite de pruebas enfocada en temas de seguridad y arquitectura: `uv run python -m unittest discover -s tests`
