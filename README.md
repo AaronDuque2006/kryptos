@@ -106,3 +106,30 @@ La suite automatizada actual valida flujos criticos de seguridad y estabilidad:
 - Timeout de sesion por inactividad para cierre automatico seguro.
 
 Estas pruebas son rapidas y deterministas para facilitar su ejecucion local y en CI en cada push/PR.
+
+## Calidad de código
+
+Para validar calidad de forma consistente en local:
+
+1. Instalar dependencias de calidad y testing:
+   ```bash
+   uv sync --extra test --extra quality
+   ```
+2. Ejecutar lint con Ruff:
+   ```bash
+   uv run ruff check .
+   ```
+3. Ejecutar type checking con Mypy:
+   ```bash
+   uv run mypy
+   ```
+4. Ejecutar tests con cobertura mínima (75% sobre `core`, `models` y `services`):
+   ```bash
+   uv run pytest --cov=core --cov=models --cov=services --cov-report=term-missing --cov-fail-under=75
+   ```
+
+Comando combinado recomendado:
+
+```bash
+uv run ruff check . && uv run mypy && uv run pytest --cov=core --cov=models --cov=services --cov-report=term-missing --cov-fail-under=75
+```
