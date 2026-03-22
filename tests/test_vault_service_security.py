@@ -3,6 +3,7 @@ import logging
 from dataclasses import dataclass
 from typing import Any, cast
 
+from core.logging_config import LOGGER_NAME
 from core.crypto import VaultCrypto
 from services.vault_service import VaultService
 
@@ -137,7 +138,7 @@ class VaultServiceSecurityTests(unittest.TestCase):
         self.assertEqual(self.repo.deleted_calls, [{"credential_id": 9, "user_id": 7}])
 
     def test_integrity_error_log_does_not_leak_secret_content(self):
-        logger = logging.getLogger("password_manager")
+        logger = logging.getLogger(LOGGER_NAME)
 
         payload_nonce, payload = self.crypto.encrypt_credential(
             {
