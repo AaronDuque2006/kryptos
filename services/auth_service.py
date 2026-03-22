@@ -69,9 +69,9 @@ def validate_username(username: str) -> tuple[bool, str]:
 
 
 class AuthService:
-    """Service for handling user authentication with rate limiting protection."""
+    """Servicio para manejar la autenticación de usuarios con protección de límite de intentos."""
 
-    # Rate limiting constants
+    # Constantes de límite de intentos
     MAX_FAILED_ATTEMPTS: int = 5
     BLOCK_DURATION_SECONDS: int = 300  # 5 minutes
 
@@ -86,72 +86,72 @@ class AuthService:
 
     def _is_rate_limited(self, username: str) -> bool:
         """
-        Check if a user is currently rate limited due to too many failed attempts.
+        Comprueba si un usuario está actualmente limitado debido a demasiados intentos fallidos.
 
         Args:
-            username: The username to check.
+            username: El nombre de usuario a comprobar.
 
         Returns:
-            True if the user is rate limited, False otherwise.
+            True si el usuario está limitado, False en caso contrario.
         """
         current_time = time.time()
 
         with self._rate_limit_lock:
-            # Filter out expired attempts
+            # Filtrar intentos expirados
             self._failed_attempts[username] = [
                 timestamp
                 for timestamp in self._failed_attempts[username]
                 if current_time - timestamp < self.BLOCK_DURATION_SECONDS
             ]
 
-            # Check if user has exceeded max attempts
+            # Comprobar si el usuario ha superado el máximo de intentos
             return len(self._failed_attempts[username]) >= self.MAX_FAILED_ATTEMPTS
 
     def _record_failed_attempt(self, username: str) -> None:
         """
-        Record a failed authentication attempt for a user.
+        Registra un intento fallido de autenticación para un usuario.
 
         Args:
-            username: The username that failed authentication.
+            username: El nombre de usuario que falló la autenticación.
         """
         with self._rate_limit_lock:
             self._failed_attempts[username].append(time.time())
 
     def _clear_failed_attempts(self, username: str) -> None:
         """
-        Clear all failed attempts for a user after successful authentication.
+        Limpia todos los intentos fallidos de un usuario tras una autenticación exitosa.
 
         Args:
-            username: The username to clear attempts for.
+            username: El nombre de usuario para limpiar los intentos.
         """
         with self._rate_limit_lock:
             self._failed_attempts[username] = []
 
     def register(self, username: str, master_password: str) -> User:
         """
-        Register a new user with validation and rate limiting protection.
+        Registra un nuevo usuario con validación y protección de límite de intentos.
 
         Args:
-            username: The desired username.
-            master_password: The master password for the user.
+            username: El nombre de usuario deseado.
+            master_password: La contraseña maestra para el usuario.
 
         Returns:
-            The newly created User object.
+            El objeto de Usuario recién creado.
 
         Raises:
-            ValueError: If validation fails, username is taken, or rate limited.
+            ValueError: Si falla la validación, el nombre de usuario está en uso o está limitado.
         """
-        # Validate username before any processing
+        # Validar el nombre de usuario antes de cualquier procesamiento
         username_valid, username_error = validate_username(username)
         if not username_valid:
             raise ValueError(username_error)
 
-        # Validate password strength before any processing
+        # Validar la fuerza de la contraseña antes de cualquier procesamiento
         password_valid, password_error = validate_password_strength(master_password)
         if not password_valid:
             raise ValueError(password_error)
 
-        # Check rate limiting after validation
+        # Comprobar el límite de intentos después de la validación
         if self._is_rate_limited(username):
             raise ValueError(
                 f"Demasiados intentos fallidos. Intente nuevamente en "
@@ -159,7 +159,7 @@ class AuthService:
             )
 
         if self.user_repo.get_user_by_username(username):
-            # Record failed attempt (username already taken)
+            # Registrar intento fallido (nombre de usuario ya en uso)
             self._record_failed_attempt(username)
             raise ValueError("El nombre de usuario ya está en uso.")
 
@@ -171,31 +171,31 @@ class AuthService:
         )
         created_user = self.user_repo.create_user(new_user)
 
-        # Clear any previous failed attempts on successful registration
+        # Limpiar cualquier intento fallido anterior en un registro exitoso
         self._clear_failed_attempts(username)
 
         return created_user
 
     def login(self, username: str, master_password: str) -> VaultCrypto:
         """
-        Authenticate a user with validation and rate limiting protection.
+        Autentica un usuario con validación y protección de límite de intentos.
 
         Args:
-            username: The username to authenticate.
-            master_password: The master password to verify.
+            username: El nombre de usuario a autenticar.
+            master_password: La contraseña maestra a verificar.
 
         Returns:
-            A VaultCrypto instance initialized with the user's credentials.
+            Una instancia de VaultCrypto inicializada con las credenciales del usuario.
 
         Raises:
-            ValueError: If validation fails, credentials are incorrect, or rate limited.
+            ValueError: Si falla la validación, las credenciales son incorrectas o están limitadas.
         """
-        # Validate username before any processing
+        # Validar el nombre de usuario antes de cualquier procesamiento
         username_valid, username_error = validate_username(username)
         if not username_valid:
             raise ValueError(username_error)
 
-        # Check rate limiting after validation
+        # Comprobar el límite de intentos después de la validación
         if self._is_rate_limited(username):
             raise ValueError(
                 f"Demasiados intentos fallidos. Intente nuevamente en "
@@ -204,7 +204,7 @@ class AuthService:
 
         user = self.user_repo.get_user_by_username(username)
         if not user:
-            # Record failed attempt for non-existent user
+            # Registrar intento fallido para un usuario inexistente
             self._record_failed_attempt(username)
             raise ValueError("Usuario o contraseña incorrectos.")
 
@@ -218,11 +218,11 @@ class AuthService:
                 pass
 
         except VerifyMismatchError:
-            # Record failed attempt for wrong password
+            # Registrar intento fallido por contraseña incorrecta
             self._record_failed_attempt(username)
             raise ValueError("Usuario o contraseña incorrectos.") from None
 
-        # Clear failed attempts on successful login
+        # Limpiar intentos fallidos tras inicio de sesión exitoso
         self._clear_failed_attempts(username)
 
         # Se instancia el motor criptográfico.
