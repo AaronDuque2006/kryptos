@@ -228,3 +228,15 @@ class AuthService:
         # Se instancia el motor criptográfico.
         # Esto deriva la clave AES de 256 bits y la mantiene en memoria.
         return VaultCrypto(master_password, user.encryption_salt)
+
+    def get_user(self, username: str) -> User | None:
+        """
+        Obtiene un usuario por su nombre de usuario.
+
+        Args:
+            username: El nombre de usuario a buscar.
+
+        Returns:
+            El objeto User si existe, None en caso contrario.
+        """
+        return self.user_repo.get_user_by_username(username)

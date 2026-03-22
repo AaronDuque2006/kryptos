@@ -149,7 +149,7 @@ class AuthScreen(Screen):
         try:
             if self.is_login_mode:
                 crypto_engine = self.auth_service.login(username, password)
-                user = self.auth_service.user_repo.get_user_by_username(username)
+                user = self.auth_service.get_user(username)
 
                 self.notify("Autenticación exitosa", severity="information")
                 self.clear_inputs()
