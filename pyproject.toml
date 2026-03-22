@@ -38,7 +38,7 @@ include = ["core*", "db*", "services*", "models*", "ui*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-q --maxfail=1"
+addopts = "-q --maxfail=1 --cov=core --cov=models --cov=services --cov-report=term-missing --cov-fail-under=75"
 
 [tool.ruff]
 line-length = 88
