@@ -1,13 +1,71 @@
+import re
 import threading
 import time
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
 from db.repository import UserRepository
 from core.crypto import VaultCrypto
 from models.user import User
+
+
+def validate_password_strength(password: str) -> Tuple[bool, str]:
+    """
+    Valida que la contraseña sea segura.
+
+    Args:
+        password: La contraseña a validar.
+
+    Returns:
+        Una tupla (es_valida, mensaje_error).
+        Si es_valida es True, mensaje_error es una cadena vacía.
+        Si es_valida es False, mensaje_error contiene la razón.
+    """
+    if len(password) < 12:
+        return (False, "La contraseña debe tener al menos 12 caracteres.")
+
+    if not re.search(r"[A-Z]", password):
+        return (False, "La contraseña debe contener al menos una letra mayúscula.")
+
+    if not re.search(r"[a-z]", password):
+        return (False, "La contraseña debe contener al menos una letra minúscula.")
+
+    if not re.search(r"\d", password):
+        return (False, "La contraseña debe contener al menos un número.")
+
+    if not re.search(r"[!@#$%^&*()_+\-=\[\]{}|;':\",./<>?`~\\]", password):
+        return (False, "La contraseña debe contener al menos un carácter especial.")
+
+    return (True, "")
+
+
+def validate_username(username: str) -> Tuple[bool, str]:
+    """
+    Valida que el username sea válido.
+
+    Args:
+        username: El nombre de usuario a validar.
+
+    Returns:
+        Una tupla (es_valido, mensaje_error).
+        Si es_valido es True, mensaje_error es una cadena vacía.
+        Si es_valido es False, mensaje_error contiene la razón.
+    """
+    if len(username) < 3:
+        return (False, "El nombre de usuario debe tener al menos 3 caracteres.")
+
+    if len(username) > 50:
+        return (False, "El nombre de usuario no puede tener más de 50 caracteres.")
+
+    if not re.match(r"^[a-zA-Z_][a-zA-Z0-9_]*$", username):
+        return (
+            False,
+            "El nombre de usuario solo puede contener letras, números y guión bajo, y no puede empezar con un número.",
+        )
+
+    return (True, "")
 
 
 class AuthService:
@@ -70,8 +128,30 @@ class AuthService:
             self._failed_attempts[username] = []
 
     def register(self, username: str, master_password: str) -> User:
-        """Register a new user with rate limiting protection."""
-        # Check rate limiting first
+        """
+        Register a new user with validation and rate limiting protection.
+
+        Args:
+            username: The desired username.
+            master_password: The master password for the user.
+
+        Returns:
+            The newly created User object.
+
+        Raises:
+            ValueError: If validation fails, username is taken, or rate limited.
+        """
+        # Validate username before any processing
+        username_valid, username_error = validate_username(username)
+        if not username_valid:
+            raise ValueError(username_error)
+
+        # Validate password strength before any processing
+        password_valid, password_error = validate_password_strength(master_password)
+        if not password_valid:
+            raise ValueError(password_error)
+
+        # Check rate limiting after validation
         if self._is_rate_limited(username):
             raise ValueError(
                 f"Demasiados intentos fallidos. Intente nuevamente en "
@@ -97,8 +177,25 @@ class AuthService:
         return created_user
 
     def login(self, username: str, master_password: str) -> VaultCrypto:
-        """Authenticate a user with rate limiting protection."""
-        # Check rate limiting first - before any credential verification
+        """
+        Authenticate a user with validation and rate limiting protection.
+
+        Args:
+            username: The username to authenticate.
+            master_password: The master password to verify.
+
+        Returns:
+            A VaultCrypto instance initialized with the user's credentials.
+
+        Raises:
+            ValueError: If validation fails, credentials are incorrect, or rate limited.
+        """
+        # Validate username before any processing
+        username_valid, username_error = validate_username(username)
+        if not username_valid:
+            raise ValueError(username_error)
+
+        # Check rate limiting after validation
         if self._is_rate_limited(username):
             raise ValueError(
                 f"Demasiados intentos fallidos. Intente nuevamente en "
