@@ -1,17 +1,17 @@
 import sys
 from pathlib import Path
+
 from core.logging_config import configure_logging
 
 # Aseguramos que Python reconozca nuestros módulos locales independientemente
 # de desde dónde se ejecute el script en la terminal.
 sys.path.append(str(Path(__file__).parent))
 
-from db.database import init_db, get_session
-from db.repository import UserRepository, CredentialRepository
+from db.database import get_session, init_db
+from db.repository import CredentialRepository, UserRepository
 from services.auth_service import AuthService
 from services.vault_service import VaultService
 from ui.app import PasswordManagerTUI
-
 
 logger = configure_logging()
 

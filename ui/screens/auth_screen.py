@@ -1,8 +1,8 @@
 from textual.app import ComposeResult
-from textual.screen import Screen
-from textual.widgets import Input, Label, Header, Footer
 from textual.containers import Vertical
 from textual.reactive import reactive
+from textual.screen import Screen
+from textual.widgets import Footer, Header, Input, Label
 
 
 class AuthScreen(Screen):

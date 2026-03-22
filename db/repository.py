@@ -1,7 +1,8 @@
+
 from sqlmodel import Session, select
-from models.user import User
+
 from models.credential import Credential
-from typing import List
+from models.user import User
 
 
 class UserRepository:
@@ -49,7 +50,7 @@ class CredentialRepository:
         self.session.refresh(new_credential)
         return new_credential
 
-    def get_credentials_by_user(self, user_id: int) -> List[Credential]:
+    def get_credentials_by_user(self, user_id: int) -> list[Credential]:
         statement = select(Credential).where(Credential.user_id == user_id)
         return list(self.session.exec(statement).all())
 

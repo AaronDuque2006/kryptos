@@ -1,7 +1,9 @@
-from sqlmodel import SQLModel, Field, Relationship
-from models.user import get_utc_now
 from datetime import datetime
 from typing import TYPE_CHECKING
+
+from sqlmodel import Field, Relationship, SQLModel
+
+from models.user import get_utc_now
 
 if TYPE_CHECKING:
     from models.user import User

@@ -1,6 +1,7 @@
-from datetime import datetime, timezone
-from sqlmodel import SQLModel, Field, Relationship
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
+
+from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
     from models.credential import Credential
@@ -8,7 +9,7 @@ if TYPE_CHECKING:
 
 def get_utc_now() -> datetime:
     # Función auxiliar para asegurar que los timestamps tengan zona horaria UTC.
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 class User(SQLModel, table=True):

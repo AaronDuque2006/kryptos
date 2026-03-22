@@ -1,5 +1,7 @@
 import time
+
 from textual.app import App
+
 from ui.screens.auth_screen import AuthScreen
 from ui.screens.dashboard_screen import DashboardScreen
 

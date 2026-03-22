@@ -1,12 +1,14 @@
 # ui/screens/dashboard_screen.py
 
-from textual.screen import Screen
-from textual.widgets import Header, Footer, DataTable, Label, Input
-from textual.containers import Vertical
 from typing import cast
+
 import pyperclip
-from ui.screens.entry_form_screen import EntryFormScreen
+from textual.containers import Vertical
+from textual.screen import Screen
+from textual.widgets import DataTable, Footer, Header, Input, Label
+
 from ui.screens.confirm_delete_screen import ConfirmDeleteScreen
+from ui.screens.entry_form_screen import EntryFormScreen
 
 EntryResult = dict[str, object]
 
