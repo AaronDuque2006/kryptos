@@ -1,8 +1,8 @@
 from textual.app import ComposeResult
-from textual.screen import Screen
-from textual.widgets import Input, Label, Header, Footer
 from textual.containers import Vertical
 from textual.reactive import reactive
+from textual.screen import Screen
+from textual.widgets import Footer, Header, Input, Label
 
 
 class AuthScreen(Screen):
@@ -23,7 +23,7 @@ class AuthScreen(Screen):
         ("down", "focus_next_field", "Abajo"),
     ]
 
-    FIELD_ORDER = ["input-username", "input-password"]
+    FIELD_ORDER = ["input-username", "input-password", "input-confirm-password"]
 
     is_login_mode = reactive(True)
 
@@ -43,6 +43,11 @@ class AuthScreen(Screen):
             yield Input(
                 placeholder="Contraseña Maestra", id="input-password", password=True
             )
+            yield Input(
+                placeholder="Confirmar contraseña",
+                id="input-confirm-password",
+                password=True,
+            )
             yield Label(
                 "F2/Ctrl+N: Login↔Registro | Enter: Enviar | Tab: Navegar",
                 id="auth-help",
@@ -52,6 +57,8 @@ class AuthScreen(Screen):
 
     def on_mount(self) -> None:
         self.query_one("#input-username", Input).focus()
+        # Ocultar campo de confirmación de contraseña por defecto (modo login)
+        self.query_one("#input-confirm-password", Input).styles.display = "none"
 
     def watch_is_login_mode(self, login_mode: bool) -> None:
         """
@@ -59,12 +66,15 @@ class AuthScreen(Screen):
         Actualiza los textos de la interfaz sin tener que recargar la pantalla.
         """
         title = self.query_one("#auth-title", Label)
+        confirm_password_input = self.query_one("#input-confirm-password", Input)
 
         if login_mode:
             title.update("Iniciar Sesión")
+            confirm_password_input.styles.display = "none"
             self.notify("Modo: Login", severity="information", timeout=1.5)
         else:
             title.update("Registrarse")
+            confirm_password_input.styles.display = "block"
             self.notify("Modo: Registro", severity="information", timeout=1.5)
 
     def _current_field_index(self) -> int:
@@ -123,6 +133,19 @@ class AuthScreen(Screen):
             self.notify("Por favor, completa todos los campos.", severity="warning")
             return
 
+        # Validación de confirmación de contraseña en modo registro
+        if not self.is_login_mode:
+            confirm_password = self.query_one("#input-confirm-password", Input).value
+            if not confirm_password:
+                self.notify("Por favor, confirma tu contraseña.", severity="warning")
+                return
+            if password != confirm_password:
+                self.notify("Las contraseñas no coinciden.", severity="error")
+                self.query_one("#input-password", Input).value = ""
+                self.query_one("#input-confirm-password", Input).value = ""
+                self.query_one("#input-password", Input).focus()
+                return
+
         try:
             if self.is_login_mode:
                 crypto_engine = self.auth_service.login(username, password)
@@ -146,6 +169,7 @@ class AuthScreen(Screen):
         except ValueError as e:
             self.notify(str(e), severity="error")
             self.query_one("#input-password", Input).value = ""
+            self.query_one("#input-confirm-password", Input).value = ""
             self.query_one("#input-password", Input).focus()
             if self.is_login_mode:
                 self.notify(
@@ -158,3 +182,4 @@ class AuthScreen(Screen):
         """Limpia los campos por seguridad tras un intento o cambio de pantalla."""
         self.query_one("#input-username", Input).value = ""
         self.query_one("#input-password", Input).value = ""
+        self.query_one("#input-confirm-password", Input).value = ""

@@ -93,4 +93,43 @@ Si deseas modificar el codigo fuente de la aplicacion localmente, la manera suge
 1. Clonar el repositorio: `git clone https://github.com/AaronDuque2006/kryptos.git`
 2. Para sincronizar las dependencias e instalar el entorno virtal: `uv sync`
 3. Para correr la aplicacion sin instalar globalmente: `uv run kryptos` o `uv run main.py`
-4. Para ejecutar la suite de pruebas enfocada en temas de seguridad y arquitectura: `uv run python -m unittest discover -s tests`
+4. Para instalar dependencias de testing (pytest y cobertura): `uv sync --extra test`
+5. Para ejecutar toda la suite de pruebas: `uv run pytest`
+
+### Cobertura de la suite de pruebas
+
+La suite automatizada actual valida flujos criticos de seguridad y estabilidad:
+
+- Seguridad de la boveda y manejo de cifrado/descifrado ante datos alterados.
+- Validaciones de autenticacion (username/password) en registro y login.
+- Rate limiting en autenticacion para bloquear intentos repetidos fallidos.
+- Timeout de sesion por inactividad para cierre automatico seguro.
+
+Estas pruebas son rapidas y deterministas para facilitar su ejecucion local y en CI en cada push/PR.
+
+## Calidad de código
+
+Para validar calidad de forma consistente en local:
+
+1. Instalar dependencias de calidad y testing:
+   ```bash
+   uv sync --extra test --extra quality
+   ```
+2. Ejecutar lint con Ruff:
+   ```bash
+   uv run ruff check .
+   ```
+3. Ejecutar type checking con Mypy:
+   ```bash
+   uv run mypy
+   ```
+4. Ejecutar tests con cobertura mínima (75% sobre `core`, `models` y `services`):
+   ```bash
+   uv run pytest --cov=core --cov=models --cov=services --cov-report=term-missing --cov-fail-under=75
+   ```
+
+Comando combinado recomendado:
+
+```bash
+uv run ruff check . && uv run mypy && uv run pytest --cov=core --cov=models --cov=services --cov-report=term-missing --cov-fail-under=75
+```

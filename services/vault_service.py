@@ -1,8 +1,6 @@
-from typing import List, Dict, cast
-from db.repository import CredentialRepository
 from core.crypto import VaultCrypto
 from core.logging_config import configure_logging
-
+from db.repository import CredentialRepository
 
 logger = configure_logging()
 
@@ -27,7 +25,7 @@ class VaultService:
         password_used: str,
         url: str = "",
         notes: str = "",
-    ):
+    ) -> None:
         # Se empaqueta los datos en un JSON, los encripta y los guarda en la base de datos.
         payload = {
             "username": username_used,
@@ -52,7 +50,7 @@ class VaultService:
             encrypted_title=encrypted_title,
         )
 
-    def get_all_entries_decrypted(self) -> List[Dict]:
+    def get_all_entries_decrypted(self) -> list[dict[str, object]]:
         """
         Se obtiene las credenciales del usuario, las desencripta en memoria
         y las devuelve como una lista de diccionarios para mostrar en la TUI.
@@ -73,7 +71,9 @@ class VaultService:
                         title_payload = self.crypto_engine.decrypt_credential(
                             cred.title_nonce, cred.encrypted_title
                         )
-                        decrypted_title = title_payload.get("title") or decrypted_title
+                        decrypted_title_value = title_payload.get("title")
+                        if isinstance(decrypted_title_value, str):
+                            decrypted_title = decrypted_title_value
                     except ValueError:
                         pass
                 else:
@@ -86,7 +86,7 @@ class VaultService:
                             self.crypto_engine.encrypt_credential({"title": cred.title})
                         )
                         self.cred_repo.update_title_encryption(
-                            credential_id=cast(int, cred_id),
+                            credential_id=cred_id,
                             user_id=self.current_user_id,
                             placeholder_title=self.TITLE_PLACEHOLDER,
                             title_nonce=migrated_title_nonce,

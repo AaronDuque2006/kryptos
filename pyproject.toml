@@ -16,6 +16,16 @@ dependencies = [
     "textual>=8.1.1",
 ]
 
+[project.optional-dependencies]
+test = [
+    "pytest>=8.3.0",
+    "pytest-cov>=5.0.0",
+]
+quality = [
+    "mypy>=1.11.0",
+    "ruff>=0.6.0",
+]
+
 [project.scripts]
 kryptos = "main:main"
 
@@ -25,3 +35,32 @@ py-modules = ["main"]
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["core*", "db*", "services*", "models*", "ui*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --maxfail=1 --cov=core --cov=models --cov=services --cov-report=term-missing --cov-fail-under=75"
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+src = ["core", "db", "models", "services", "ui", "tests", "."]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unused_configs = true
+pretty = true
+show_error_codes = true
+exclude = ["^ui/"]
+ignore_missing_imports = true
+namespace_packages = true
+explicit_package_bases = true
+files = ["core", "db", "models", "services"]

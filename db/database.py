@@ -2,7 +2,8 @@ import os
 import stat
 import subprocess
 from pathlib import Path
-from sqlmodel import SQLModel, create_engine, Session
+
+from sqlmodel import Session, SQLModel, create_engine
 
 APP_DIR = Path.home() / ".tui_vault"
 DB_PATH = APP_DIR / "vault.db"
@@ -16,9 +17,9 @@ engine = create_engine(
 )
 
 
-def init_db():
-    from models.user import User  # noqa: F401
+def init_db() -> None:
     from models.credential import Credential  # noqa: F401
+    from models.user import User  # noqa: F401
 
     SQLModel.metadata.create_all(engine)
     _run_schema_migrations()
