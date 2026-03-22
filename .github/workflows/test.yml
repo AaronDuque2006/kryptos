@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  pytest:
+  quality:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -21,7 +21,13 @@ jobs:
         uses: astral-sh/setup-uv@v3
 
       - name: Install project dependencies
-        run: uv sync --extra test
+        run: uv sync --extra test --extra quality
 
-      - name: Run test suite
-        run: uv run pytest
+      - name: Run lint (ruff)
+        run: uv run ruff check .
+
+      - name: Run type checking (mypy)
+        run: uv run mypy
+
+      - name: Run test suite with coverage threshold
+        run: uv run pytest --cov=core --cov=models --cov=services --cov-report=term-missing --cov-fail-under=75
