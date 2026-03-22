@@ -1,4 +1,4 @@
-# Password Manager TUI
+# Kryptos Password Manager TUI
 
 ## Descripcion del Proyecto
 Esta aplicacion es un gestor de contraseñas altamente seguro ejecutado enteramente desde la terminal mediante una interfaz de usuario en modo texto (TUI) construida con la libreria Textual.
