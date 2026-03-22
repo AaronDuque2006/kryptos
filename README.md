@@ -93,4 +93,16 @@ Si deseas modificar el codigo fuente de la aplicacion localmente, la manera suge
 1. Clonar el repositorio: `git clone https://github.com/AaronDuque2006/kryptos.git`
 2. Para sincronizar las dependencias e instalar el entorno virtal: `uv sync`
 3. Para correr la aplicacion sin instalar globalmente: `uv run kryptos` o `uv run main.py`
-4. Para ejecutar la suite de pruebas enfocada en temas de seguridad y arquitectura: `uv run python -m unittest discover -s tests`
+4. Para instalar dependencias de testing (pytest y cobertura): `uv sync --extra test`
+5. Para ejecutar toda la suite de pruebas: `uv run pytest`
+
+### Cobertura de la suite de pruebas
+
+La suite automatizada actual valida flujos criticos de seguridad y estabilidad:
+
+- Seguridad de la boveda y manejo de cifrado/descifrado ante datos alterados.
+- Validaciones de autenticacion (username/password) en registro y login.
+- Rate limiting en autenticacion para bloquear intentos repetidos fallidos.
+- Timeout de sesion por inactividad para cierre automatico seguro.
+
+Estas pruebas son rapidas y deterministas para facilitar su ejecucion local y en CI en cada push/PR.
