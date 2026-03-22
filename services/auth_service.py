@@ -2,16 +2,16 @@ import re
 import threading
 import time
 from collections import defaultdict
-from typing import Dict, List, Tuple
 
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from db.repository import UserRepository
+
 from core.crypto import VaultCrypto
+from db.repository import UserRepository
 from models.user import User
 
 
-def validate_password_strength(password: str) -> Tuple[bool, str]:
+def validate_password_strength(password: str) -> tuple[bool, str]:
     """
     Valida que la contraseña sea segura.
 
@@ -41,7 +41,7 @@ def validate_password_strength(password: str) -> Tuple[bool, str]:
     return (True, "")
 
 
-def validate_username(username: str) -> Tuple[bool, str]:
+def validate_username(username: str) -> tuple[bool, str]:
     """
     Valida que el username sea válido.
 
@@ -81,7 +81,7 @@ class AuthService:
         self.ph = PasswordHasher()
 
         # Rate limiting: username -> list of failed attempt timestamps
-        self._failed_attempts: Dict[str, List[float]] = defaultdict(list)
+        self._failed_attempts: dict[str, list[float]] = defaultdict(list)
         self._rate_limit_lock = threading.Lock()
 
     def _is_rate_limited(self, username: str) -> bool:
@@ -220,7 +220,7 @@ class AuthService:
         except VerifyMismatchError:
             # Record failed attempt for wrong password
             self._record_failed_attempt(username)
-            raise ValueError("Usuario o contraseña incorrectos.")
+            raise ValueError("Usuario o contraseña incorrectos.") from None
 
         # Clear failed attempts on successful login
         self._clear_failed_attempts(username)
