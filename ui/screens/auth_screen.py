@@ -151,10 +151,13 @@ class AuthScreen(Screen):
                 crypto_engine = self.auth_service.login(username, password)
                 user = self.auth_service.get_user(username)
 
+                if user is None:
+                    raise ValueError("No se pudo cargar el perfil del usuario.")
+
                 self.notify("Autenticación exitosa", severity="information")
                 self.clear_inputs()
 
-                self.on_success_callback(crypto_engine, user.id)
+                self.on_success_callback(crypto_engine, user)
 
             else:
                 self.auth_service.register(username, password)

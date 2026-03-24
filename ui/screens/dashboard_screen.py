@@ -22,6 +22,7 @@ class DashboardScreen(Screen):
         ("n", "new_entry", "Nueva"),
         ("e", "edit_selected", "Editar"),
         ("c", "copy_password", "Copiar"),
+        ("t", "cycle_theme", "Tema"),
         ("o", "open_selected", "Ver"),
         ("d", "delete_selected", "Borrar"),
         ("r", "refresh_table", "Actualizar"),
@@ -152,6 +153,53 @@ class DashboardScreen(Screen):
         idx = self._resolve_index_arg(index_arg)
         self._open_delete_confirmation(idx)
 
+    def _command_list_themes(self) -> None:
+        available_themes = getattr(self.app, "AVAILABLE_THEMES", ())
+        if not available_themes:
+            self.notify("No hay temas disponibles.", severity="warning")
+            return
+
+        current_theme = getattr(self.app, "theme", "desconocido")
+        themes_text = ", ".join(available_themes)
+        self.notify(
+            f"Tema actual: {current_theme}\nDisponibles: {themes_text}",
+            severity="information",
+            timeout=8,
+        )
+
+    def _command_set_theme(self, theme_name: str) -> None:
+        # Comando explícito para cambiar tema: :theme <nombre>
+        theme_setter = getattr(self.app, "set_theme", None)
+        if not callable(theme_setter):
+            self.notify("La app no soporta cambio de tema.", severity="error")
+            return
+
+        if not theme_name:
+            self.notify("Uso: :theme <nombre>", severity="warning")
+            return
+
+        theme_setter(theme_name)
+
+    def action_cycle_theme(self) -> None:
+        """Cambia al siguiente tema disponible (atajo: t)."""
+        available_themes = list(getattr(self.app, "AVAILABLE_THEMES", ()))
+        if not available_themes:
+            self.notify("No hay temas para ciclar.", severity="warning")
+            return
+
+        current_theme = getattr(self.app, "theme", available_themes[0])
+        try:
+            current_index = available_themes.index(current_theme)
+        except ValueError:
+            current_index = -1
+
+        next_theme = available_themes[(current_index + 1) % len(available_themes)]
+        theme_setter = getattr(self.app, "set_theme", None)
+        if callable(theme_setter):
+            theme_setter(next_theme)
+        else:
+            self.notify("La app no soporta cambio de tema.", severity="error")
+
     def _open_delete_confirmation(self, idx: int) -> None:
         entry = self.current_entries[idx]
         title = str(entry.get("title", "Sin título"))
@@ -216,7 +264,7 @@ class DashboardScreen(Screen):
         self._showing_help = True
         self.notify(
             "Atajos: n=nueva | e=editar | c=copia | o=ver | d=borrar | r=refresca | ctrl+l=logout | q=salir\n"
-            "Comandos: :new | :edit N | :copy N | :open N | :del N | :refresh | :logout | :help\n"
+            "Comandos: :new | :edit N | :copy N | :open N | :del N | :refresh | :theme NOMBRE | :themes | :logout | :help\n"
             "Navegación: Flechas mueven selección | Enter abre detalle",
             severity="information",
             timeout=10,
@@ -330,6 +378,12 @@ class DashboardScreen(Screen):
             self.action_refresh_table()
         elif cmd == "help":
             self.action_show_help()
+        elif cmd == "themes":
+            self._command_list_themes()
+        elif cmd == "theme" and arg:
+            self._command_set_theme(arg)
+        elif cmd == "theme" and not arg:
+            self.notify("Uso: :theme <nombre>", severity="warning")
         else:
             self.notify(
                 f"Comando no reconocido: {command}. Escribe :help para ver comandos.",

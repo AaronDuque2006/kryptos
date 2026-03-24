@@ -1,4 +1,3 @@
-
 from sqlmodel import Session, select
 
 from models.credential import Credential
@@ -22,6 +21,17 @@ class UserRepository:
     def get_user_by_username(self, username: str) -> User | None:
         stament = select(User).where(User.username == username)
         return self.session.exec(stament).first()
+
+    def update_user_theme(self, user_id: int, theme: str) -> bool:
+        """Actualiza el tema preferido del usuario."""
+        user = self.session.get(User, user_id)
+        if user is None:
+            return False
+
+        user.theme = theme
+        self.session.add(user)
+        self.session.commit()
+        return True
 
 
 class CredentialRepository:

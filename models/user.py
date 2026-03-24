@@ -23,6 +23,8 @@ class User(SQLModel, table=True):
 
     encryption_salt: bytes = Field(nullable=False)
 
+    theme: str = Field(default="textual-dark", max_length=50)
+
     created_at: datetime = Field(default_factory=get_utc_now)
 
     credentials: list["Credential"] = Relationship(
