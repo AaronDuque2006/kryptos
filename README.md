@@ -66,6 +66,12 @@ Cuando exista una nueva version del software o un parche de seguridad, puedes ac
 uv tool upgrade kryptos-password-manager
 ```
 
+### Migraciones automáticas de base de datos
+
+Desde la versión actual, la aplicación ejecuta migraciones ligeras al iniciar para mantener compatibilidad con instalaciones previas.
+En particular, si una base SQLite existente tiene la tabla `users` sin la columna `theme`, se agrega automáticamente en el arranque con valor por defecto `textual-dark`.
+La rutina es idempotente (si la columna ya existe no realiza cambios) y no requiere intervención manual.
+
 ---
 
 ## Como Ejecutar y Utilizar la Aplicacion
